@@ -1,9 +1,9 @@
 
 
-**Before thinking about modeling, have a look at your data. Try to understand variables' distri-
+## Before thinking about modeling, have a look at your data. Try to understand variables' distri-
 butions and their relationships with the target variable. Which variables do you think could be
 major predictors of diagnosis? Also clean your data appropriately: Are there highly correlated
-variables? Are there any missing values or outliers? If yes, how you handle them?**
+variables? Are there any missing values or outliers? If yes, how you handle them? ##
 ```{r}
 train_data <- read.csv(file="C:/Users/vbrahm7/Documents/DM_Assignment_2/trainX.csv", header = F)
 train_y <- read.csv(file = "C:/Users/vbrahm7/Documents/DM_Assignment_2/trainY.csv", header = F)
