@@ -1,0 +1,122 @@
+
+
+**Before thinking about modeling, have a look at your data. Try to understand variables' distri-
+butions and their relationships with the target variable. Which variables do you think could be
+major predictors of diagnosis? Also clean your data appropriately: Are there highly correlated
+variables? Are there any missing values or outliers? If yes, how you handle them?**
+```{r}
+train_data <- read.csv(file="C:/Users/vbrahm7/Documents/DM_Assignment_2/trainX.csv", header = F)
+train_y <- read.csv(file = "C:/Users/vbrahm7/Documents/DM_Assignment_2/trainY.csv", header = F)
+test_data <- read.csv(file = "C:/Users/vbrahm7/Documents/DM_Assignment_2/testX.csv", header = F)
+test_y <- read.csv(file = "C:/Users/vbrahm7/Documents/DM_Assignment_2/testY.csv", header = F)
+colnames(train_data) <- c("radius_mean", "texture_mean", "perimeter_mean", "area_mean", "smoothness_mean","compactness_mean", "concavity_mean", "concave_mean", "symmetry_mean", "fractal_mean","radius_sd", "texture_sd", "perimeter_sd", "area_sd", "smoothness_sd","compactness_sd", "concavity_sd", "concave_sd", "symmetry_sd", "fractal_sd","radius_max", "texture_max", "perimeter_max", "area_max", "smoothness_max","compactness_max", "concavity_max", "concave_max", "symmetry_max", "fractal_max")
+colnames(test_data) <- c("radius_mean", "texture_mean", "perimeter_mean", "area_mean", "smoothness_mean","compactness_mean", "concavity_mean", "concave_mean", "symmetry_mean", "fractal_mean","radius_sd", "texture_sd", "perimeter_sd", "area_sd", "smoothness_sd","compactness_sd", "concavity_sd", "concave_sd", "symmetry_sd", "fractal_sd","radius_max", "texture_max", "perimeter_max", "area_max", "smoothness_max","compactness_max", "concavity_max", "concave_max", "symmetry_max", "fractal_max")
+colnames(train_y) <- "malignant"
+colnames(test_y) <- "malignant"
+final_train_data <- cbind.data.frame(train_data,train_y)
+final_test_data <- cbind.data.frame(test_data,test_y)
+```
+```{r}
+str(final_train_data)
+str(final_test_data)
+
+is.na(final_train_data)
+is.na(final_test_data)
+```
+| No missing values in the final_train_data and final_test_data
+
+| Radius, Perimeter, Area and Concavity could be the major predictors of diagnosis
+```{r}
+cor(final_train_data)
+cor(final_test_data)
+
+boxplot(final_train_data)
+boxplot(final_test_data)
+```
+| There are outliers in the table. 
+
+| Tree based models are resistant towards outliers and multicollinearity, so we use create a decision tree model.
+
+**Create a decision tree (using \information" for splits) to its full depth. How many leaves are in
+this tree?**
+```{r}
+library(rpart)
+dtm <- rpart(malignant~., data= final_train_data, control = rpart.control(cp=-1, minsplit = 2))
+print(dtm)
+
+library(rpart.plot)
+leaves<-length(unique(dtm$where))
+print(leaves)
+```
+
+**What are the major predictors of diagnosis suggested by your tree? Please justify your reasoning.
+Do these major predictors are the same as the ones you observed in first question**
+```{r}
+major_predictor<- dtm$variable.importance
+major_predictor
+```
+| concave_mean, perimeter_max, concave_max are the major predictors as these are the top three important variables.
+| We did predict that the concave and the perimeter could be the major predictors.  
+
+**Give two strong rules that describe who is likely to have cancer. Please justify your choices.**
+```{r}
+print(dtm)
+```
+| Strong rule 1: smoothness_mean>=0.08027 & perimeter_max>=97.155 & texture_max>=20.875 & concave_mean>=0.05592
+| support = (145/455)*100 = 31.21%
+| confidence = (142/143)*100 = 99.3%
+
+| Strong rule 2: smoothness_mean< 0.10865 & perimeter_max< 97.155 & texture_max>=20.875 & concave_mean>=0.05592
+| support = (4/455)*100 = 0.88%
+| confidence = (4/7)*100 = 57.1%
+
+**What is the accuracy of your decision tree model on the training data? What is the accuracy
+of this model on the test data?**
+```{r}
+library(rpart)
+```
+| Training data accuracy
+```{r}
+predict_train_data<-predict(dtm, new_final_data = final_train_data)
+table_train_data<- table(predict_train_data,final_train_data$malignant)
+accuracy_train_data<- sum(diag(table_train_data))/sum(table_train_data)
+print(accuracy_train_data)
+```
+| Test data accuracy
+```{r}
+predict_test_data<-predict(dtm,final_test_data)
+table_test_data<-table(predict_test_data,final_test_data$malignant)
+accuracy_test_data<-sum(diag(table_test_data))/sum(table_test_data)
+print(accuracy_test_data)
+```
+
+**Construct the "best possible" decision tree to predict the Y labels. Explain how you construct
+such tree and how you evaluate its performance.**
+```{r}
+printcp(dtm)
+plotcp(dtm)
+```
+In order to predict the Y-lables, we construct the best possible decision tree and we get such a tree if we take cp value to be 0.023(the first value below the horizontal dotted line).
+```{r}
+best_dtm <- rpart(malignant~., data= final_train_data, control = rpart.control(cp=0.023, minsplit = 2))
+print(best_dtm)
+predict_best_dtm<-predict(best_dtm,final_train_data)
+table_best_dtm<-table(predict_best_dtm,final_train_data$malignant)
+best_dtm_recall <- table_best_dtm[2,2]/(table_best_dtm[2,1] + table_best_dtm[2,2])
+print(best_dtm_recall)
+best_dtm_precision <- table_best_dtm[2,2]/(table_best_dtm[1,2] + table_best_dtm[2,2])
+print(best_dtm_precision)
+accuracy_best_dtm<-sum(diag(table_best_dtm))/sum(table_best_dtm)
+print(accuracy_best_dtm)
+```
+| The recall value = 0.01162791
+| The precision value = 1
+| The accuracy value = 0.05054945
+
+**Plot your final decision tree model and write down all decision rules that you will consider for
+predictions.**
+```{r}
+rpart.plot(best_dtm)
+rules_best_dtm<-rpart.rules(best_dtm)
+print(rules_best_dtm)
+```
