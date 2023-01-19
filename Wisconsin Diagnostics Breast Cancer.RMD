@@ -5,10 +5,10 @@ butions and their relationships with the target variable. Which variables do you
 major predictors of diagnosis? Also clean your data appropriately: Are there highly correlated
 variables? Are there any missing values or outliers? If yes, how you handle them?**
 ```{r}
-train_data <- read.csv(file="C:/Users/vbrahm7/Documents/DM_Assignment_2/trainX.csv", header = F)
-train_y <- read.csv(file = "C:/Users/vbrahm7/Documents/DM_Assignment_2/trainY.csv", header = F)
-test_data <- read.csv(file = "C:/Users/vbrahm7/Documents/DM_Assignment_2/testX.csv", header = F)
-test_y <- read.csv(file = "C:/Users/vbrahm7/Documents/DM_Assignment_2/testY.csv", header = F)
+train_data <- read.csv(file="C:/Users/abomma5/Documents/DM_Assignment_2/trainX.csv", header = F)
+train_y <- read.csv(file = "C:/Users/abomma5/Documents/DM_Assignment_2/trainY.csv", header = F)
+test_data <- read.csv(file = "C:/Users/abomma5/Documents/DM_Assignment_2/testX.csv", header = F)
+test_y <- read.csv(file = "C:/Users/abomma5/Documents/DM_Assignment_2/testY.csv", header = F)
 colnames(train_data) <- c("radius_mean", "texture_mean", "perimeter_mean", "area_mean", "smoothness_mean","compactness_mean", "concavity_mean", "concave_mean", "symmetry_mean", "fractal_mean","radius_sd", "texture_sd", "perimeter_sd", "area_sd", "smoothness_sd","compactness_sd", "concavity_sd", "concave_sd", "symmetry_sd", "fractal_sd","radius_max", "texture_max", "perimeter_max", "area_max", "smoothness_max","compactness_max", "concavity_max", "concave_max", "symmetry_max", "fractal_max")
 colnames(test_data) <- c("radius_mean", "texture_mean", "perimeter_mean", "area_mean", "smoothness_mean","compactness_mean", "concavity_mean", "concave_mean", "symmetry_mean", "fractal_mean","radius_sd", "texture_sd", "perimeter_sd", "area_sd", "smoothness_sd","compactness_sd", "concavity_sd", "concave_sd", "symmetry_sd", "fractal_sd","radius_max", "texture_max", "perimeter_max", "area_max", "smoothness_max","compactness_max", "concavity_max", "concave_max", "symmetry_max", "fractal_max")
 colnames(train_y) <- "malignant"
@@ -112,11 +112,3 @@ print(accuracy_best_dtm)
 | The recall value = 0.01162791
 | The precision value = 1
 | The accuracy value = 0.05054945
-
-**Plot your final decision tree model and write down all decision rules that you will consider for
-predictions.**
-```{r}
-rpart.plot(best_dtm)
-rules_best_dtm<-rpart.rules(best_dtm)
-print(rules_best_dtm)
-```
